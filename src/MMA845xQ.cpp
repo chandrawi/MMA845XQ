@@ -168,6 +168,43 @@ void MMA845xQ::readNew(int16_t* rawX, int16_t* rawY, int16_t* rawZ)
     *rawZ = _dataZ;
 }
 
+int16_t MMA845xQ::_readInst(uint8_t registry, bool mode)
+{
+    int16_t dataInst;
+    if (mode) {
+        uint8_t data;
+        _readBytes(registry, &data, 1); // Read an acceleration data
+        dataInst = data;
+        if (data > 0x7F) dataInst |= 0xFF00; // Set 8 bits MSB to 1 if data is negative
+    } else {
+        uint8_t data[2];
+        _readBytes(registry, data, 2); // Read an acceleration data
+        uint8_t shiftBits = 16 - _dataBits;
+        dataInst = ((((int16_t) data[0]) << 8) | data[1]) >> shiftBits; // Shift 14/12/10-bit 2'complement to 16-bit integer
+        uint8_t maskBits = 0xFFFF << _dataBits;
+        if (data[0] > 0x7F) dataInst |= 0xFF00; // Set 8 bits MSB to 1 if data is negative
+    }
+    return dataInst;
+}
+
+int16_t MMA845xQ::readInstX()
+{
+    if (_dataBits == 8) return _readInst(MMA845XQ_REG_OUT_X_FAST, true); // Read acceleration data for fast mode
+    else return _readInst(MMA845XQ_REG_OUT_X_MSB, false);                // Read acceleration data for normal mode
+}
+
+int16_t MMA845xQ::readInstY()
+{
+    if (_dataBits == 8) return _readInst(MMA845XQ_REG_OUT_Y_FAST, true); // Read acceleration data for fast mode
+    else return _readInst(MMA845XQ_REG_OUT_Y_MSB, false);                // Read acceleration data for normal mode
+}
+
+int16_t MMA845xQ::readInstZ()
+{
+    if (_dataBits == 8) return _readInst(MMA845XQ_REG_OUT_Z_FAST, true); // Read acceleration data for fast mode
+    else return _readInst(MMA845XQ_REG_OUT_Z_MSB, false);                // Read acceleration data for normal mode
+}
+
 void MMA845xQ::acceleration(double* accelX, double* accelY, double* accelZ)
 {
     _readData(); // Read data from sensor

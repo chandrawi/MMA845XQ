@@ -135,6 +135,11 @@
 // Register address
 #define MMA845XQ_REG_STATUS                 0x00
 #define MMA845XQ_REG_OUT_X_MSB              0x01
+#define MMA845XQ_REG_OUT_Y_MSB              0x03
+#define MMA845XQ_REG_OUT_Z_MSB              0x05
+#define MMA845XQ_REG_OUT_X_FAST             0x01
+#define MMA845XQ_REG_OUT_Y_FAST             0x02
+#define MMA845XQ_REG_OUT_Z_FAST             0x03
 #define MMA845XQ_REG_F_SETUP                0x09
 #define MMA845XQ_REG_TRIG_CFG               0x0A
 #define MMA845XQ_REG_SYSMOD                 0x0B
@@ -194,6 +199,9 @@ class MMA845xQ
         int16_t readY();
         int16_t readZ();
         void readNew(int16_t* rawX, int16_t* rawY, int16_t* rawZ);
+        int16_t readInstX();
+        int16_t readInstY();
+        int16_t readInstZ();
 
         void acceleration(double* accelX, double* accelY, double* accelZ);
         double accelerationX();
@@ -312,6 +320,7 @@ class MMA845xQ
         void _readData();
         void _readDataFast();
         void _readDataNormal();
+        int16_t _readInst(uint8_t registry, bool mode);
 
         int8_t _dataToOffset(int16_t data);
         int16_t _offsetToData(int8_t offset);

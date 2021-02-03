@@ -17,6 +17,9 @@ readX	KEYWORD2
 readY	KEYWORD2
 readZ	KEYWORD2
 readNew	KEYWORD2
+readInstX	KEYWORD2
+readInstY	KEYWORD2
+readInstZ	KEYWORD2
 acceleration	KEYWORD2
 accelerationX	KEYWORD2
 accelerationY	KEYWORD2
