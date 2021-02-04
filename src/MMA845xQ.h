@@ -249,8 +249,8 @@ class MMA845xQ
         void setOrientationEnable(bool enable=true);
         void setOrientation(uint8_t threshold, uint8_t hysterisis, uint8_t backFront, uint8_t zLock, uint8_t counter=0, bool debounceMode=false);
         bool checkOrientation();
-        uint8_t orientationStatus;
-        bool orientationZlock;
+        uint8_t orientationStatus();
+        bool orientationZlock();
 
         uint8_t getMotionMode();
         uint8_t getMotionAxis();
@@ -259,9 +259,9 @@ class MMA845xQ
         void setMotionEnable(bool enable=true);
         void setMotion(uint8_t mode, uint8_t axis, uint8_t threshold, uint8_t counter=0, bool debounceMode=false);
         bool checkMotion();
-        int8_t motionAxisX;
-        int8_t motionAxisY;
-        int8_t motionAxisZ;
+        int8_t motionAxisX();
+        int8_t motionAxisY();
+        int8_t motionAxisZ();
 
         uint8_t getTransientMode();
         uint8_t getTransientAxis();
@@ -270,9 +270,9 @@ class MMA845xQ
         void setTransientEnable(bool enable=true);
         void setTransient(uint8_t mode, uint8_t axis, uint8_t threshold, uint8_t counter=0, bool debounceMode=false);
         bool checkTransient();
-        int8_t transientAxisX;
-        int8_t transientAxisY;
-        int8_t transientAxisZ;
+        int8_t transientAxisX();
+        int8_t transientAxisY();
+        int8_t transientAxisZ();
 
         uint8_t getPulseMode();
         uint8_t getPulseThresholdX();
@@ -284,9 +284,9 @@ class MMA845xQ
         void setPulseEnable(bool enable=true);
         void setPulse(uint8_t mode, uint8_t axis, uint8_t thresholdX, uint8_t thresholdY, uint8_t thresholdZ, uint8_t timeLimit, uint8_t timeLatency, uint8_t timeWindow);
         bool checkPulse();
-        int8_t pulseAxisX;
-        int8_t pulseAxisY;
-        int8_t pulseAxisZ;
+        int8_t pulseAxisX();
+        int8_t pulseAxisY();
+        int8_t pulseAxisZ();
 
         void requestInterrupt(uint8_t interruptPin, uint8_t interruptEvent, uint8_t interruptMode);
         void requestInterrupt(uint8_t interruptPin, uint8_t interruptEvent);
@@ -318,13 +318,11 @@ class MMA845xQ
         uint8_t _axisTransient;
         uint8_t _axisPulse;
 
-        bool _interruptDataReady;
-        bool _interruptMotion;
-        bool _interruptPulse;
-        bool _interruptOrientation;
-        bool _interruptTransient;
-        bool _interruptFifo;
-        bool _interruptAutoSleep;
+        uint8_t _checkOrientation;
+        uint8_t _checkMotion;
+        uint8_t _checkTransient;
+        uint8_t _checkPulse;
+        uint8_t _checkInterrupt;
 
         void _readData();
         void _readDataFast();

@@ -100,13 +100,13 @@ requestInterrupt	KEYWORD2
 setInterruptMode	KEYWORD2
 resetInterrupt	KEYWORD2
 checkInterrupt	KEYWORD2
-interruptDataReady	KEYWORD2
-interruptMotion	KEYWORD2
-interruptPulse	KEYWORD2
-interruptOrientation	KEYWORD2
-interruptTransient	KEYWORD2
-interruptFifo	KEYWORD2
-interruptAutoSleep	KEYWORD2
+checkInterruptDataReady	KEYWORD2
+checkInterruptMotion	KEYWORD2
+checkInterruptPulse	KEYWORD2
+checkInterruptOrientation	KEYWORD2
+checkInterruptTransient	KEYWORD2
+checkInterruptFifo	KEYWORD2
+checkInterruptAutoSleep	KEYWORD2
 
 # Instances (KEYWORD2)
 

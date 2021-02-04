@@ -68,7 +68,7 @@ void setup() {
   );
   Accel.setTransientEnable();
 
-  // Request interrupt for motion and transient detection on interrupt pi 1
+  // Request interrupt for motion and transient detection on interrupt pin 1
   Accel.requestInterrupt(MMA845XQ_INT_PIN_1, MMA845XQ_INT_EVENT_MOTION_WAKE, MMA845XQ_INT_MODE_FALLING);
   Accel.requestInterrupt(MMA845XQ_INT_PIN_1, MMA845XQ_INT_EVENT_TRANSIENT_WAKE, MMA845XQ_INT_MODE_FALLING);
 
@@ -81,40 +81,37 @@ void loop() {
 
   // Check for motion or transient threshold reached
   if(flag){
-    uint8_t intCode = Accel.checkInterrupt();
 
     // Check if motion event detected
     // Show which axis triggered motion detection interrupt and its polarity
     if (Accel.checkMotion()){
-      Serial.print("Motion interrupt triggered (code: ");
-      Serial.print(intCode);
-      Serial.print(")\nAxis-X: ");
-      Serial.print(Accel.motionAxisX);
+      Serial.print("Motion interrupt triggered");
+      Serial.print("\nAxis-X: ");
+      Serial.print(Accel.motionAxisX());
       Serial.print("\tAxis-Y: ");
-      Serial.print(Accel.motionAxisY);
+      Serial.print(Accel.motionAxisY());
       Serial.print("\tAxis-Z: ");
-      Serial.print(Accel.motionAxisZ);
+      Serial.print(Accel.motionAxisZ());
       Serial.print("\n\n");
     }
 
     // Check if transient event detected
     // Show which axis triggered transient detection interrupt and its polarity
     if (Accel.checkTransient()){
-      Serial.print("Transient interrupt triggered (code: ");
-      Serial.print(intCode);
-      Serial.print(")\nAxis-X: ");
-      Serial.print(Accel.transientAxisX);
+      Serial.print("Transient interrupt triggered");
+      Serial.print("\nAxis-X: ");
+      Serial.print(Accel.transientAxisX());
       Serial.print("\tAxis-Y: ");
-      Serial.print(Accel.transientAxisY);
+      Serial.print(Accel.transientAxisY());
       Serial.print("\tAxis-Z: ");
-      Serial.print(Accel.transientAxisZ);
+      Serial.print(Accel.transientAxisZ());
       Serial.print("\n\n");
     }
 
     // Show message if interrupt didn't caused by motion or transient detection
-    if (!Accel.interruptMotion && !Accel.interruptTransient){
+    if (!Accel.checkInterruptMotion() && !Accel.checkInterruptTransient()){
       Serial.print("Unknown interrupt (code: ");
-      Serial.print(intCode);
+      Serial.print(Accel.checkInterrupt());
       Serial.print(")\n\n");
       return;
     }
@@ -141,6 +138,8 @@ void loop() {
     }
     Serial.print("\n");
 
+    // Clear serial buffer
+    Serial.flush();
     // Clear interrupt flag
     flag = false;
   }
@@ -149,9 +148,6 @@ void loop() {
 
 void Sleep() {
 
-  // Clear serial buffer
-  Serial.flush();
-  
   // Allow wake up pin to trigger interrupt on falling.
   attachInterrupt(digitalPinToInterrupt(wakeUpPin), wakeUp, FALLING);
 

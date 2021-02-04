@@ -549,11 +549,19 @@ void MMA845xQ::setOrientation(uint8_t threshold, uint8_t hysterisis, uint8_t bac
 
 bool MMA845xQ::checkOrientation()
 {
-    uint8_t pl_status = _readByte(MMA845XQ_REG_PL_STATUS);
+    _checkOrientation = _readByte(MMA845XQ_REG_PL_STATUS);
     
-    orientationStatus = pl_status & 0b00000111;
-    orientationZlock = pl_status & 0b01000000;
-    return pl_status & 0b10000000;
+    return _checkOrientation & 0b10000000;
+}
+
+uint8_t MMA845xQ::orientationStatus()
+{
+    return _checkOrientation & 0b00000111;
+}
+
+bool MMA845xQ::orientationZlock()
+{
+    return _checkOrientation & 0b01000000;
 }
 
 uint8_t MMA845xQ::getMotionMode()
@@ -605,23 +613,36 @@ void MMA845xQ::setMotion(uint8_t mode, uint8_t axis, uint8_t threshold, uint8_t 
 
 bool MMA845xQ::checkMotion()
 {
-    uint8_t ff_mt_src = _readByte(MMA845XQ_REG_FF_MT_SRC);
-    motionAxisX = 0;
-    motionAxisY = 0;
-    motionAxisZ = 0;
-    if (ff_mt_src & 0b00000010){ // Select X-axis motion detection flag
-        if (ff_mt_src & 0b00000001) motionAxisX = -1; // Asign value -1 if polarity negative
-        else motionAxisX = 1;
+    _checkMotion = _readByte(MMA845XQ_REG_FF_MT_SRC);
+
+    return _checkMotion & 0b10000000; // Select event flag in bit7
+}
+
+int8_t MMA845xQ::motionAxisX()
+{
+    if (_checkMotion & 0b00000010){ // Select X-axis motion detection flag
+        if (_checkMotion & 0b00000001) return -1; // Asign value -1 if polarity negative
+        else return 1;
     }
-    if (ff_mt_src & 0b00001000){ // Select Y-axis motion detection flag
-        if (ff_mt_src & 0b00000100) motionAxisY = -1; // Asign value -1 if polarity negative
-        else motionAxisY = 1;
+    return 0;
+}
+
+int8_t MMA845xQ::motionAxisY()
+{
+    if (_checkMotion & 0b00001000){ // Select Y-axis motion detection flag
+        if (_checkMotion & 0b00000100) return -1; // Asign value -1 if polarity negative
+        else return 1;
     }
-    if (ff_mt_src & 0b00100000){ // Select Y-axis motion detection flag
-        if (ff_mt_src & 0b00010000) motionAxisZ = -1; // Asign value -1 if polarity negative
-        else motionAxisZ = 1;
+    return 0;
+}
+
+int8_t MMA845xQ::motionAxisZ()
+{
+    if (_checkMotion & 0b00100000){ // Select Y-axis motion detection flag
+        if (_checkMotion & 0b00010000) return -1; // Asign value -1 if polarity negative
+        else return 1;
     }
-    return ff_mt_src & 0b10000000; // Select event flag in bit7
+    return 0;
 }
 
 uint8_t MMA845xQ::getTransientMode()
@@ -673,23 +694,36 @@ void MMA845xQ::setTransient(uint8_t mode, uint8_t axis, uint8_t threshold, uint8
 
 bool MMA845xQ::checkTransient()
 {
-    uint8_t transient_src = _readByte(MMA845XQ_REG_TRANSIENT_SRC);
-    transientAxisX = 0;
-    transientAxisY = 0;
-    transientAxisZ = 0;
-    if (transient_src & 0b00000010){ // Select X-axis transient detection flag
-        if (transient_src & 0b00000001) transientAxisX = -1; // Asign value -1 if polarity negative
-        else transientAxisX = 1;
+    _checkTransient = _readByte(MMA845XQ_REG_TRANSIENT_SRC);
+
+    return _checkTransient & 0b01000000; // Select event flag in bit6
+}
+
+int8_t MMA845xQ::transientAxisX()
+{
+    if (_checkTransient & 0b00000010){ // Select X-axis transient detection flag
+        if (_checkTransient & 0b00000001) return -1; // Asign value -1 if polarity negative
+        else return 1;
     }
-    if (transient_src & 0b00001000){ // Select Y-axis transient detection flag
-        if (transient_src & 0b00000100) transientAxisY = -1; // Asign value -1 if polarity negative
-        else transientAxisY = 1;
+    return 0;
+}
+
+int8_t MMA845xQ::transientAxisY()
+{
+    if (_checkTransient & 0b00001000){ // Select Y-axis transient detection flag
+        if (_checkTransient & 0b00000100) return -1; // Asign value -1 if polarity negative
+        else return 1;
     }
-    if (transient_src & 0b00100000){ // Select Y-axis transient detection flag
-        if (transient_src & 0b00010000) transientAxisZ = -1; // Asign value -1 if polarity negative
-        else transientAxisZ = 1;
+    return 0;
+}
+
+int8_t MMA845xQ::transientAxisZ()
+{
+    if (_checkTransient & 0b00100000){ // Select Y-axis transient detection flag
+        if (_checkTransient & 0b00010000) return -1; // Asign value -1 if polarity negative
+        else return 1;
     }
-    return transient_src & 0b01000000; // Select event flag in bit6
+    return 0;
 }
 
 uint8_t MMA845xQ::getPulseMode()
@@ -755,25 +789,42 @@ void MMA845xQ::setPulse(uint8_t mode, uint8_t axis, uint8_t thresholdX, uint8_t 
 
 bool MMA845xQ::checkPulse()
 {
-    uint8_t pulse_src = _readByte(MMA845XQ_REG_PULSE_SRC);
-    pulseAxisX = 0;
-    pulseAxisY = 0;
-    pulseAxisZ = 0;
+    _checkPulse = _readByte(MMA845XQ_REG_PULSE_SRC);
+
+    return _checkPulse & 0b10000000; // Select event flag in bit7
+}
+
+int8_t MMA845xQ::pulseAxisX()
+{
     uint8_t singleDouble = 1; // Single pulse detected
-    if (pulse_src & 0b00001000) singleDouble = 2; // Double pulse detected
-    if (pulse_src & 0b00010000){ // Select X-axis pulse detection flag
-        if (pulse_src & 0b00000001) pulseAxisX = 0 - singleDouble; // Asign value -1 if polarity negative
-        else pulseAxisX = singleDouble;
+    if (_checkPulse & 0b00001000) singleDouble = 2; // Double pulse detected
+    if (_checkPulse & 0b00010000){ // Select X-axis pulse detection flag
+        if (_checkPulse & 0b00000001) return 0 - singleDouble; // Asign value -1 if polarity negative
+        else return singleDouble;
     }
-    if (pulse_src & 0b00100000){ // Select Y-axis pulse detection flag
-        if (pulse_src & 0b00000010) pulseAxisY = 0 - singleDouble; // Asign value -1 if polarity negative
-        else pulseAxisY = singleDouble;
+    return 0;
+}
+
+int8_t MMA845xQ::pulseAxisY()
+{
+    uint8_t singleDouble = 1; // Single pulse detected
+    if (_checkPulse & 0b00001000) singleDouble = 2; // Double pulse detected
+    if (_checkPulse & 0b00100000){ // Select Y-axis pulse detection flag
+        if (_checkPulse & 0b00000010) return 0 - singleDouble; // Asign value -1 if polarity negative
+        else return singleDouble;
     }
-    if (pulse_src & 0b01000000){ // Select Y-axis pulse detection flag
-        if (pulse_src & 0b00000100) pulseAxisZ = 0 - singleDouble; // Asign value -1 if polarity negative
-        else pulseAxisZ = singleDouble;
+    return 0;
+}
+
+int8_t MMA845xQ::pulseAxisZ()
+{
+    uint8_t singleDouble = 1; // Single pulse detected
+    if (_checkPulse & 0b00001000) singleDouble = 2; // Double pulse detected
+    if (_checkPulse & 0b01000000){ // Select Y-axis pulse detection flag
+        if (_checkPulse & 0b00000100) return 0 - singleDouble; // Asign value -1 if polarity negative
+        else return singleDouble;
     }
-    return pulse_src & 0b10000000; // Select event flag in bit7
+    return 0;
 }
 
 void MMA845xQ::requestInterrupt(uint8_t interruptPin, uint8_t interruptEvent, uint8_t interruptMode)
@@ -839,102 +890,94 @@ void MMA845xQ::resetInterrupt()
 
 uint8_t MMA845xQ::checkInterrupt()
 {
-    uint8_t int_source = _readByte(MMA845XQ_REG_INT_SOURCE); // Checking interrupt source
+    _checkInterrupt = _readByte(MMA845XQ_REG_INT_SOURCE); // Checking interrupt source
     // Check fifo interrupt from data status register
-    if (_readBits(MMA845XQ_REG_STATUS, 6, 2) && _readBit(MMA845XQ_REG_CTRL_REG4, 6)) int_source |= 0b01000000;
-    
-    _interruptDataReady = false;
-    _interruptMotion = false;
-    _interruptPulse = false;
-    _interruptOrientation = false;
-    _interruptTransient = false;
-    _interruptFifo = false;
-    _interruptAutoSleep = false;
-    if (int_source & 0b00000001) _interruptDataReady = true;
-    if (int_source & 0b00000100) _interruptMotion = true;
-    if (int_source & 0b00001000) _interruptPulse = true;
-    if (int_source & 0b00010000) _interruptOrientation = true;
-    if (int_source & 0b00100000) _interruptTransient = true;
-    if (int_source & 0b01000000) _interruptFifo = true;
-    if (int_source & 0b10000000) _interruptAutoSleep = true;
-    
-    return int_source;
+    if (_readBits(MMA845XQ_REG_STATUS, 6, 2) && _readBit(MMA845XQ_REG_CTRL_REG4, 6)) _checkInterrupt |= 0b01000000;
+
+    return _checkInterrupt;
 }
 
 bool MMA845xQ::checkInterruptDataReady()
 {
-    if (_interruptDataReady) {          // Clear interruptDataReady flag and return true
-        _interruptDataReady = false;
+    if (_checkInterrupt & 0b00000001) {               // Clear interruptDataReady flag and return true
+        _checkInterrupt &= 0b11111110;
         return true;
-    } else {                            // Check interrupt register
-        checkInterrupt();
-        return _interruptDataReady;
+    } else {                                          // Check interrupt register for data ready
+        uint8_t flag = checkInterrupt() & 0b00000001;
+        if (flag) _checkInterrupt &= 0b11111110;
+        return flag;
     }
 }
 
 bool MMA845xQ::checkInterruptMotion()
 {
-    if (_interruptMotion) {             // Clear interruptMotion flag and return true
-        _interruptMotion = false;
+    if (_checkInterrupt & 0b00000100) {               // Clear interruptMotion flag and return true
+        _checkInterrupt &= 0b11111011;
         return true;
-    } else {                            // Check interrupt register
-        checkInterrupt();
-        return _interruptMotion;
+    } else {                                          // Check interrupt register for motion
+        uint8_t flag = checkInterrupt() & 0b00000100;
+        if (flag) _checkInterrupt &= 0b11111011;
+        return flag;
     }
 }
 
 bool MMA845xQ::checkInterruptPulse()
 {
-    if (_interruptPulse) {              // Clear interruptPulse flag and return true
-        _interruptPulse = false;
+    if (_checkInterrupt & 0b00001000) {               // Clear interruptPulse flag and return true
+        _checkInterrupt &= 0b11110111;
         return true;
-    } else {                            // Check interrupt register
-        checkInterrupt();
-        return _interruptPulse;
+    } else {                                          // Check interrupt register for pulse
+        uint8_t flag = checkInterrupt() & 0b00001000;
+        if (flag) _checkInterrupt &= 0b11110111;
+        return flag;
     }
 }
 
 bool MMA845xQ::checkInterruptOrientation()
 {
-    if (_interruptOrientation) {        // Clear interruptOrientation flag and return true
-        _interruptOrientation = false;
+    if (_checkInterrupt & 0b00010000) {               // Clear interruptOrientation flag and return true
+        _checkInterrupt &= 0b11101111;
         return true;
-    } else {                            // Check interrupt register
-        checkInterrupt();
-        return _interruptOrientation;
+    } else {                                          // Check interrupt register for orientation
+        uint8_t flag = checkInterrupt() & 0b00010000;
+        if (flag) _checkInterrupt &= 0b11101111;
+        return flag;
     }
 }
 
 bool MMA845xQ::checkInterruptTransient()
 {
-    if (_interruptTransient) {          // Clear interruptTransient flag and return true
-        _interruptTransient = false;
+    if (_checkInterrupt & 0b00100000) {               // Clear interruptTransient flag and return true
+        _checkInterrupt &= 0b11011111;
         return true;
-    } else {                            // Check interrupt register
-        checkInterrupt();
-        return _interruptTransient;
+    } else {                                          // Check interrupt register for transient
+        uint8_t flag = checkInterrupt() & 0b00100000;
+        if (flag) _checkInterrupt &= 0b11011111;
+        return flag;
     }
 }
 
 bool MMA845xQ::checkInterruptFifo()
 {
-    if (_interruptFifo) {               // Clear interruptFifo flag and return true
-        _interruptFifo = false;
+    if (_checkInterrupt & 0b01000000) {               // Clear interruptFifo flag and return true
+        _checkInterrupt &= 0b10111111;
         return true;
-    } else {                            // Check interrupt register
-        checkInterrupt();
-        return _interruptFifo;
+    } else {                                          // Check interrupt register for FIFO
+        uint8_t flag = checkInterrupt() & 0b01000000;
+        if (flag) _checkInterrupt &= 0b10111111;
+        return flag;
     }
 }
 
 bool MMA845xQ::checkInterruptAutoSleep()
 {
-    if (_interruptAutoSleep) {          // Clear interruptAutoSleep flag and return true
-        _interruptAutoSleep = false;
+    if (_checkInterrupt & 0b10000000) {               // Clear interruptAutoSleep flag and return true
+        _checkInterrupt &= 0b01111111;
         return true;
-    } else {                            // Check interrupt register
-        checkInterrupt();
-        return _interruptAutoSleep;
+    } else {                                          // Check interrupt register for auto sleep
+        uint8_t flag = checkInterrupt() & 0b10000000;
+        if (flag) _checkInterrupt &= 0b01111111;
+        return flag;
     }
 }
 

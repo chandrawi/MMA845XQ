@@ -43,7 +43,7 @@ void loop() {
     if (Sensor.checkOrientation()){
 
       // Show current orientaion
-      switch (Sensor.orientationStatus){
+      switch (Sensor.orientationStatus()){
         case MMA845XQ_PORTRAIT_UP_FRONT:
           Serial.println("PORTRAIT_UP_FRONT");
           break;
@@ -71,14 +71,16 @@ void loop() {
       }
 
       // Check if z-lock detected
-      if (Sensor.orientationZlock){
+      if (Sensor.orientationZlock()){
         Serial.println("Z-lock detected");
       }
       
       Serial.println();
     }
 	
-	// Clear interrupt flag
+    // Clear serial buffer
+    Serial.flush();
+	  // Clear interrupt flag
     flag = false;
   }
 
