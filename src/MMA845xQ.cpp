@@ -168,6 +168,15 @@ void MMA845xQ::readNew(int16_t* rawX, int16_t* rawY, int16_t* rawZ)
     *rawZ = _dataZ;
 }
 
+void MMA845xQ::readInst(int16_t* rawX, int16_t* rawY, int16_t* rawZ)
+{
+    if (_dataBits == 8) _readDataFast(); // Read acceleration data from register for fast mode
+    else _readDataNormal();              // Read acceleration data from register for normal mode
+    *rawX = _dataX;
+    *rawY = _dataY;
+    *rawZ = _dataZ;
+}
+
 int16_t MMA845xQ::_readInst(uint8_t registry, bool mode)
 {
     int16_t dataInst;

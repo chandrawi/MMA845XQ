@@ -17,6 +17,7 @@ readX	KEYWORD2
 readY	KEYWORD2
 readZ	KEYWORD2
 readNew	KEYWORD2
+readInst	KEYWORD2
 readInstX	KEYWORD2
 readInstY	KEYWORD2
 readInstZ	KEYWORD2
