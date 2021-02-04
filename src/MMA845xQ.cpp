@@ -843,22 +843,99 @@ uint8_t MMA845xQ::checkInterrupt()
     // Check fifo interrupt from data status register
     if (_readBits(MMA845XQ_REG_STATUS, 6, 2) && _readBit(MMA845XQ_REG_CTRL_REG4, 6)) int_source |= 0b01000000;
     
-    interruptDataReady = false;
-    interruptMotion = false;
-    interruptPulse = false;
-    interruptOrientation = false;
-    interruptTransient = false;
-    interruptFifo = false;
-    interruptAutoSleep = false;
-    if (int_source & 0b00000001) interruptDataReady = true;
-    if (int_source & 0b00000100) interruptMotion = true;
-    if (int_source & 0b00001000) interruptPulse = true;
-    if (int_source & 0b00010000) interruptOrientation = true;
-    if (int_source & 0b00100000) interruptTransient = true;
-    if (int_source & 0b01000000) interruptFifo = true;
-    if (int_source & 0b10000000) interruptAutoSleep = true;
+    _interruptDataReady = false;
+    _interruptMotion = false;
+    _interruptPulse = false;
+    _interruptOrientation = false;
+    _interruptTransient = false;
+    _interruptFifo = false;
+    _interruptAutoSleep = false;
+    if (int_source & 0b00000001) _interruptDataReady = true;
+    if (int_source & 0b00000100) _interruptMotion = true;
+    if (int_source & 0b00001000) _interruptPulse = true;
+    if (int_source & 0b00010000) _interruptOrientation = true;
+    if (int_source & 0b00100000) _interruptTransient = true;
+    if (int_source & 0b01000000) _interruptFifo = true;
+    if (int_source & 0b10000000) _interruptAutoSleep = true;
     
     return int_source;
+}
+
+bool MMA845xQ::checkInterruptDataReady()
+{
+    if (_interruptDataReady) {          // Clear interruptDataReady flag and return true
+        _interruptDataReady = false;
+        return true;
+    } else {                            // Check interrupt register
+        checkInterrupt();
+        return _interruptDataReady;
+    }
+}
+
+bool MMA845xQ::checkInterruptMotion()
+{
+    if (_interruptMotion) {             // Clear interruptMotion flag and return true
+        _interruptMotion = false;
+        return true;
+    } else {                            // Check interrupt register
+        checkInterrupt();
+        return _interruptMotion;
+    }
+}
+
+bool MMA845xQ::checkInterruptPulse()
+{
+    if (_interruptPulse) {              // Clear interruptPulse flag and return true
+        _interruptPulse = false;
+        return true;
+    } else {                            // Check interrupt register
+        checkInterrupt();
+        return _interruptPulse;
+    }
+}
+
+bool MMA845xQ::checkInterruptOrientation()
+{
+    if (_interruptOrientation) {        // Clear interruptOrientation flag and return true
+        _interruptOrientation = false;
+        return true;
+    } else {                            // Check interrupt register
+        checkInterrupt();
+        return _interruptOrientation;
+    }
+}
+
+bool MMA845xQ::checkInterruptTransient()
+{
+    if (_interruptTransient) {          // Clear interruptTransient flag and return true
+        _interruptTransient = false;
+        return true;
+    } else {                            // Check interrupt register
+        checkInterrupt();
+        return _interruptTransient;
+    }
+}
+
+bool MMA845xQ::checkInterruptFifo()
+{
+    if (_interruptFifo) {               // Clear interruptFifo flag and return true
+        _interruptFifo = false;
+        return true;
+    } else {                            // Check interrupt register
+        checkInterrupt();
+        return _interruptFifo;
+    }
+}
+
+bool MMA845xQ::checkInterruptAutoSleep()
+{
+    if (_interruptAutoSleep) {          // Clear interruptAutoSleep flag and return true
+        _interruptAutoSleep = false;
+        return true;
+    } else {                            // Check interrupt register
+        checkInterrupt();
+        return _interruptAutoSleep;
+    }
 }
 
 // uint8_t MMA845xQ::peek()

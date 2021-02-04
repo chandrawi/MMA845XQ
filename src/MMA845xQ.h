@@ -294,13 +294,13 @@ class MMA845xQ
         void resetInterrupt(uint8_t interruptPinEvent);
         void resetInterrupt();
         uint8_t checkInterrupt();
-        bool interruptDataReady;
-        bool interruptMotion;
-        bool interruptPulse;
-        bool interruptOrientation;
-        bool interruptTransient;
-        bool interruptFifo;
-        bool interruptAutoSleep;
+        bool checkInterruptDataReady();
+        bool checkInterruptMotion();
+        bool checkInterruptPulse();
+        bool checkInterruptOrientation();
+        bool checkInterruptTransient();
+        bool checkInterruptFifo();
+        bool checkInterruptAutoSleep();
 
     // uint8_t peek();
 
@@ -317,6 +317,14 @@ class MMA845xQ
         uint8_t _axisMotion;
         uint8_t _axisTransient;
         uint8_t _axisPulse;
+
+        bool _interruptDataReady;
+        bool _interruptMotion;
+        bool _interruptPulse;
+        bool _interruptOrientation;
+        bool _interruptTransient;
+        bool _interruptFifo;
+        bool _interruptAutoSleep;
 
         void _readData();
         void _readDataFast();
