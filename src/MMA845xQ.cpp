@@ -315,18 +315,18 @@ int8_t MMA845xQ::_dataToOffset(int16_t data)
         else {
             if (((0 - data) % divider) > (divider / 2)) offset--;
         }
-        return offset;
+        return -offset;
     }
     else {
         int16_t offset = data * (512 / _range);
-        return (int8_t) offset;
+        return (int8_t) -offset;
     }
 }
 
 int16_t MMA845xQ::_offsetToData(int8_t offset)
 {
     if (_range > 512){
-        return offset * (_range / 512);
+        return -offset * (_range / 512);
     }
     else {
         uint8_t divider = 512 / _range;
@@ -337,7 +337,7 @@ int16_t MMA845xQ::_offsetToData(int8_t offset)
         else {
             if (((0 - offset) % divider) > (divider / 2)) data--;
         }
-        return data;
+        return -data;
     }
 }
 
