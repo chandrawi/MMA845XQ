@@ -182,8 +182,8 @@ class MMA845xQ
 {
     public:
 
-        MMA845xQ();
-        MMA845xQ(uint8_t deviceAddress);
+        MMA845xQ(TwoWire &wireObject=Wire);
+        MMA845xQ(uint8_t deviceAddress, TwoWire &wireObject=Wire);
 
         bool begin();
         bool begin(uint32_t clock);
@@ -306,6 +306,7 @@ class MMA845xQ
 
     private:
 
+        TwoWire* _wire;
         uint8_t _deviceAddress;
         uint8_t _deviceId;
         int16_t _dataX, _dataY, _dataZ;
@@ -317,7 +318,6 @@ class MMA845xQ
         uint8_t _axisMotion;
         uint8_t _axisTransient;
         uint8_t _axisPulse;
-
         uint8_t _checkOrientation;
         uint8_t _checkMotion;
         uint8_t _checkTransient;

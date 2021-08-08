@@ -2,28 +2,23 @@
 
 // Constructor
 
-MMA845xQ::MMA845xQ()
+MMA845xQ::MMA845xQ(TwoWire &wireObject)
 {
     _deviceAddress = MMA845XQ_I2C_ADDR;
+    _wire = &wireObject;
 }
 
-MMA845xQ::MMA845xQ(uint8_t deviceAddress)
+MMA845xQ::MMA845xQ(uint8_t deviceAddress, TwoWire &wireObject)
 {
     _deviceAddress = deviceAddress;
+    _wire = &wireObject;
 }
 
 // Public
 
 bool MMA845xQ::begin()
 {
-    return begin(100000L); // Normal
-}
-
-bool MMA845xQ::begin(uint32_t clock)
-{
-    Wire.begin();
-    if (clock != 10000L || clock != 400000L) clock = 100000L;
-    Wire.setClock(clock);
+    _wire->begin();
     
     // Check device ID
     _deviceId = _readByte(MMA845XQ_REG_WHO_AM_I);
@@ -46,6 +41,13 @@ bool MMA845xQ::begin(uint32_t clock)
     // Set to active mode
     active();
     
+    return true;
+}
+
+bool MMA845xQ::begin(uint32_t clock)
+{
+    if (!begin()) return false;
+    _wire->setClock(clock);
     return true;
 }
 
@@ -1038,22 +1040,22 @@ uint8_t MMA845xQ::_readBytes(uint8_t address, uint8_t* data, uint8_t nBytes)
 {
     uint8_t i = 0;
     
-    Wire.beginTransmission(_deviceAddress);
-    Wire.write(address);
-    Wire.endTransmission(false);
+    _wire->beginTransmission(_deviceAddress);
+    _wire->write(address);
+    _wire->endTransmission(false);
     
-    Wire.requestFrom(_deviceAddress, nBytes);
-    while(Wire.available()) data[i++] = Wire.read();
+    _wire->requestFrom(_deviceAddress, nBytes);
+    while(_wire->available()) data[i++] = _wire->read();
     
     return i;
 }
 
 bool MMA845xQ::_writeBytes(uint8_t address, uint8_t* data, uint8_t nBytes)
 {
-    Wire.beginTransmission(_deviceAddress);
-    Wire.write(address);
-    Wire.write(data, nBytes);
-    int8_t stat = Wire.endTransmission();
+    _wire->beginTransmission(_deviceAddress);
+    _wire->write(address);
+    _wire->write(data, nBytes);
+    int8_t stat = _wire->endTransmission();
 
     if (stat == 0) return true;
     return false;
