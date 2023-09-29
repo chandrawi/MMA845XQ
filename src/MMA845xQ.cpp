@@ -121,7 +121,7 @@ void MMA845xQ::_readDataNormal()
     _dataX = ((((int16_t) data[0]) << 8) | data[1]) >> shiftBits; // Shift 14/12/10-bit 2'complement to 16-bit integer
     _dataY = ((((int16_t) data[2]) << 8) | data[3]) >> shiftBits;
     _dataZ = ((((int16_t) data[4]) << 8) | data[5]) >> shiftBits;
-    uint8_t maskBits = 0xFFFF << _dataBits;
+    uint16_t maskBits = 0xFFFF << _dataBits;
     if (data[0] > 0x7F) _dataX |= maskBits; // Set (16 - n) bits MSB to 1 if data is negative
     if (data[2] > 0x7F) _dataY |= maskBits;
     if (data[4] > 0x7F) _dataZ |= maskBits;
@@ -983,11 +983,6 @@ bool MMA845xQ::checkInterruptAutoSleep()
     }
 }
 
-// uint8_t MMA845xQ::peek()
-// {
-    // return _dataBits;
-// }
-
 // Private
 
 uint8_t MMA845xQ::_readBit(uint8_t address, uint8_t startBit)
@@ -1059,4 +1054,10 @@ bool MMA845xQ::_writeBytes(uint8_t address, uint8_t* data, uint8_t nBytes)
 
     if (stat == 0) return true;
     return false;
+}
+
+bool MMA845xQ::isConnected()
+{
+    _wire->beginTransmission(_deviceAddress);
+    return _wire->endTransmission() == 0;
 }

@@ -188,6 +188,7 @@ class MMA845xQ
         bool begin();
         bool begin(uint32_t clock);
         uint8_t deviceId();
+        bool isConnected();
 
         void standby();
         void active();
@@ -301,8 +302,6 @@ class MMA845xQ
         bool checkInterruptTransient();
         bool checkInterruptFifo();
         bool checkInterruptAutoSleep();
-
-    // uint8_t peek();
 
     private:
 
