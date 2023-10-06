@@ -200,6 +200,7 @@ class MMA845xQ
         int16_t readY();
         int16_t readZ();
         void readNew(int16_t* rawX, int16_t* rawY, int16_t* rawZ);
+        bool checkNew();
         void readInst(int16_t* rawX, int16_t* rawY, int16_t* rawZ);
         int16_t readInstX();
         int16_t readInstY();

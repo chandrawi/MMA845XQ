@@ -170,6 +170,13 @@ void MMA845xQ::readNew(int16_t* rawX, int16_t* rawY, int16_t* rawZ)
     *rawZ = _dataZ;
 }
 
+bool MMA845xQ::checkNew()
+{
+    uint8_t status = 0x00;
+    _readBytes(MMA845XQ_REG_STATUS, &status, 1);
+    return status;
+}
+
 void MMA845xQ::readInst(int16_t* rawX, int16_t* rawY, int16_t* rawZ)
 {
     if (_dataBits == 8) _readDataFast(); // Read acceleration data from register for fast mode
@@ -192,8 +199,8 @@ int16_t MMA845xQ::_readInst(uint8_t registry, bool mode)
         _readBytes(registry, data, 2); // Read an acceleration data
         uint8_t shiftBits = 16 - _dataBits;
         dataInst = ((((int16_t) data[0]) << 8) | data[1]) >> shiftBits; // Shift 14/12/10-bit 2'complement to 16-bit integer
-        uint8_t maskBits = 0xFFFF << _dataBits;
-        if (data[0] > 0x7F) dataInst |= 0xFF00; // Set 8 bits MSB to 1 if data is negative
+        uint16_t maskBits = 0xFFFF << _dataBits;
+        if (data[0] > 0x7F) dataInst |= maskBits; // Set 8 bits MSB to 1 if data is negative
     }
     return dataInst;
 }
